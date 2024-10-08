@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
@@ -15,7 +13,6 @@ public class Spawner : MonoBehaviour
 
     public void GenerateMaze()
     {
-        Debug.Log("Проверка");
         foreach(Transform child in mazeHandler.transform)
             GameObject.Destroy(child.gameObject);
 
