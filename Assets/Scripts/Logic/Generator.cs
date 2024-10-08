@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEngine;
 public class Generator
 {
@@ -68,6 +69,16 @@ public class Generator
                 currentCell = stack.Pop();
         }
         while (stack.Count > 0);
+    }
+
+    private void AldousBroderAlgorithm()
+    {
+
+    }
+
+    private void WilsonsAlgorithm()
+    {
+
     }
 
     private void RemoveWall(MazeCell a, MazeCell b)
