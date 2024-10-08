@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
@@ -8,8 +9,10 @@ public class Spawner : MonoBehaviour
     public Cell CellPrefab;
     public Vector2 CellSize = new Vector2(1, 1);
 
-    public int Width = 10;
-    public int Height = 10;
+    public int Width;
+    public int Height;
+
+    private int _generationAlgorithm;
 
     public void GenerateMaze()
     {
@@ -17,7 +20,7 @@ public class Spawner : MonoBehaviour
             GameObject.Destroy(child.gameObject);
 
         Generator generator = new Generator();
-        Maze maze = generator.GenerateMaze(Width, Height);
+        Maze maze = generator.GenerateMaze(Width, Height, _generationAlgorithm);
 
         for (int x = 0; x < maze.cells.GetLength(0); x++)
         {
@@ -37,6 +40,10 @@ public class Spawner : MonoBehaviour
                 c.transform.parent = mazeHandler.transform;
             }
         }
-        cam.transform.position = new Vector3((Width * CellSize.x) / 2, Mathf.Max(Width, Height) * 8, (Height * CellSize.y) / 2);
+        cam.transform.position = new Vector3((Width * CellSize.x) / 2, Mathf.Max(Width, Height) * 3, (Height * CellSize.y) / 2);
     }
+
+    public void ChangeHeight(float value) => Height = (int)value;
+    public void ChangeWidht(float value) => Width = (int)value;
+    public void ChangeGenerationAlgorithm (int value) => _generationAlgorithm = value;
 }

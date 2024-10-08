@@ -5,7 +5,7 @@ public class Generator
     public int Width = 10;
     public int Height = 10;
 
-    public Maze GenerateMaze(int width, int height)
+    public Maze GenerateMaze(int width, int height, int generationAlgorthm)
     {
         Width = width;
         Height = height;
@@ -20,9 +20,19 @@ public class Generator
             }
         }
 
-        RecursiveBacktracker(cells);
-        //WilsonsAlgorithm(cells);
-
+        switch (generationAlgorthm)
+        {
+            case 0:
+                RecursiveBacktracker(cells);
+                break;
+            case 1:
+                AldousBroderAlgorithm();
+                break;
+            case 2:
+                WilsonsAlgorithm(cells);
+                break;
+        }
+        
         Maze maze = new Maze();
         maze.cells = cells;
 
