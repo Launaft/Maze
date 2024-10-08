@@ -30,7 +30,7 @@ public class Generator
 
     private void RecursiveBacktracker(MazeCell[,] cells)
     {
-        MazeCell currentCell = cells[0, 0];
+        MazeCell currentCell = cells[Random.Range(0, Width - 1), Random.Range(0, Height - 1)];
         currentCell.Visited = true;
 
         Stack<MazeCell> stack = new Stack<MazeCell>();
