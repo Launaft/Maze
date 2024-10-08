@@ -73,7 +73,39 @@ public class Generator
 
     private void AldousBroderAlgorithm()
     {
-
+        int[,] gridMaze = new int[Width, Height];
+        int[,] gridVizited = new int[Width, Height];
+        int w = 0;
+        int h = 0;
+        gridVizited[0, 0] = 1;
+        int summVizited = 1;
+        while (summVizited < Width * Height)
+        {
+            if (w > 0 && h > 0 && w < Width && h < Height)
+            {
+                int i = Random.Range(0, 3);//Случайное число для направления
+                if (i == 0)
+                {
+                    w--;
+                }
+                switch (i)
+                {
+                    case 0:
+                        w++; break;
+                    case 1:
+                        h++; break;
+                    case 2:
+                        w--; break;
+                    case 3:
+                        h--; break;
+                }
+                if (gridVizited[w, h] == 0)
+                {
+                    gridVizited[w, h] = 1;
+                    //Уничтожение стенки тут будет
+                }
+            }
+        }
     }
 
     private void WilsonsAlgorithm()
