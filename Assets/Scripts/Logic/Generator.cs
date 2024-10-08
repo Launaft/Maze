@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using UnityEngine;
 public class Generator
 {
     public int Width = 10;
@@ -18,9 +20,83 @@ public class Generator
             }
         }
 
+        RecursiveBacktracker(cells);
+
         Maze maze = new Maze();
         maze.cells = cells;
 
         return maze;
+    }
+
+    private void RecursiveBacktracker(MazeCell[,] cells)
+    {
+        MazeCell currentCell = cells[0, 0];
+        currentCell.Visited = true;
+
+        Stack<MazeCell> stack = new Stack<MazeCell>();
+
+        do
+        {
+            List<MazeCell> unvisitedNeighbours = new List<MazeCell>();
+
+            int x = currentCell.X;
+            int y = currentCell.Y;
+
+            if (x > 0 && !cells[x - 1, y].Visited)
+                unvisitedNeighbours.Add(cells[x - 1, y]);
+
+            if (y > 0 && !cells[x, y - 1].Visited)
+                unvisitedNeighbours.Add(cells[x, y - 1]);
+
+            if (x < Width - 1 && !cells[x + 1, y].Visited)
+                unvisitedNeighbours.Add(cells[x + 1, y]);
+
+            if (y < Height - 1 && !cells[x, y + 1].Visited)
+                unvisitedNeighbours.Add(cells[x, y + 1]);
+
+            if (unvisitedNeighbours.Count > 0)
+            {
+                MazeCell nextCell = unvisitedNeighbours[Random.Range(0, unvisitedNeighbours.Count)];
+                RemoveWall(currentCell, nextCell);
+
+                nextCell.Visited = true;
+                stack.Push(nextCell);
+
+                currentCell = nextCell;
+            }
+            else
+                currentCell = stack.Pop();
+        }
+        while (stack.Count > 0);
+    }
+
+    private void RemoveWall(MazeCell a, MazeCell b)
+    {
+        if (a.X == b.X)
+        {
+            if (a.Y > b.Y)
+            {
+                a.South = false;
+                b.North = false;
+            }
+            else
+            {
+                b.South = false;
+                a.North = false;
+            }
+        }
+        else
+        {
+            if (a.X > b.X)
+            {
+                a.West = false;
+                b.East = false;
+            }
+            else
+            {
+                b.West = false;
+                a.East = false;
+            }
+        }
     }
 }
