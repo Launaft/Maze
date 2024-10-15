@@ -127,94 +127,104 @@ public class Generator
 
         int unvisitedCells = cells.Length - 1;
 
+        Stack<MazeCell> stack = new Stack<MazeCell>();
+        stack.Push(currentCell);
+
         do
         {
-            Stack<MazeCell> stack = new Stack<MazeCell>();
-
-            stack.Push(currentCell);
-
             int x = currentCell.X;
             int y = currentCell.Y;
 
             switch (Random.Range(1, 4))
             {
-                case 1:
-                    if (x > 0 && !cells[x - 1, y].Visited && !stack.Contains(cells[x - 1, y]))
+                case 1: // Left
+                    if (x > 0)
                     {
-                        currentCell = cells[x - 1, y];
-                        stack.Push(cells[x - 1, y]);
-                    }
-                    else if (x > 0 && stack.Contains(cells[x - 1, y]))
-                    {
-                        currentCell = cells[x - 1, y];
-                        stack = RemoveCycle(stack, currentCell);
-                    }
-                    else if (x > 0 && cells[x - 1, y].Visited)
-                    {
-                        unvisitedCells -= stack.Count;
-                        GoBackOnStack(stack);
-                        currentCell = SetGraphStart(ref cells);
-                    }
-                break;
-
-                case 2:
-                    if (y > 0 && !cells[x, y - 1].Visited && !stack.Contains(cells[x, y - 1]))
-                    {
-                        currentCell = cells[x, y - 1];
-                        stack.Push(cells[x, y - 1]);
-                    }
-                    else if (y > 0 && stack.Contains(cells[x, y - 1]))
-                    {
-                        currentCell = cells[x, y - 1];
-                        stack = RemoveCycle(stack, currentCell);
-                    }
-                    else if (y > 0 && cells[x, y - 1].Visited)
-                    {
-                        unvisitedCells -= stack.Count;
-                        GoBackOnStack(stack);
-                        currentCell = SetGraphStart(ref cells);
+                        if (!cells[x - 1, y].Visited && !stack.Contains(cells[x - 1, y]))
+                        {
+                            currentCell = cells[x - 1, y];
+                            stack.Push(currentCell);
+                        }
+                        else if (stack.Contains(cells[x - 1, y]))
+                        {
+                            currentCell = cells[x - 1, y];
+                            stack = RemoveCycle(stack, currentCell);
+                        }
+                        else if (cells[x - 1, y].Visited)
+                        {
+                            unvisitedCells -= stack.Count;
+                            GoBackOnStack(stack);
+                            currentCell = SetGraphStart(ref cells);
+                        }
                     }
                 break;
 
-                case 3:
-                    if (x < Width - 1 && !cells[x + 1, y].Visited && !stack.Contains(cells[x + 1, y]))
+                case 2: // Down
+                    if (y > 0)
                     {
-                        currentCell = cells[x + 1, y];
-                        stack.Push(cells[x + 1, y]);
-                    }
-                    else if (x < Width - 1 && stack.Contains(cells[x + 1, y]))
-                    {
-                        currentCell = cells[x + 1, y];
-                        stack = RemoveCycle(stack, currentCell);
-                    }
-                    else if (x < Width - 1 && cells[x + 1, y].Visited)
-                    {
-                        unvisitedCells -= stack.Count;
-                        GoBackOnStack(stack);
-                        currentCell = SetGraphStart(ref cells);
+                        if (!cells[x, y - 1].Visited && !stack.Contains(cells[x, y - 1]))
+                        {
+                            currentCell = cells[x, y - 1];
+                            stack.Push(currentCell);
+                        }
+                        else if (stack.Contains(cells[x, y - 1]))
+                        {
+                            currentCell = cells[x, y - 1];
+                            stack = RemoveCycle(stack, currentCell);
+                        }
+                        else if (cells[x, y - 1].Visited)
+                        {
+                            unvisitedCells -= stack.Count;
+                            GoBackOnStack(stack);
+                            currentCell = SetGraphStart(ref cells);
+                        }
                     }
                 break;
 
-                case 4:
-                    if (y < Height - 1 && !cells[x, y + 1].Visited && !stack.Contains(cells[x, y + 1]))
+                case 3: // Right
+                    if (x < Width - 1)
                     {
-                        currentCell = cells[x, y + 1];
-                        stack.Push(cells[x, y + 1]);
+                        if (x < Width - 1 && !cells[x + 1, y].Visited && !stack.Contains(cells[x + 1, y]))
+                        {
+                            currentCell = cells[x + 1, y];
+                            stack.Push(currentCell);
+                        }
+                        else if (x < Width - 1 && stack.Contains(cells[x + 1, y]))
+                        {
+                            currentCell = cells[x + 1, y];
+                            stack = RemoveCycle(stack, currentCell);
+                        }
+                        else if (x < Width - 1 && cells[x + 1, y].Visited)
+                        {
+                            unvisitedCells -= stack.Count;
+                            GoBackOnStack(stack);
+                            currentCell = SetGraphStart(ref cells);
+                        }
                     }
-                    else if (y < Height - 1 && stack.Contains(cells[x, y + 1]))
+                break;
+
+                case 4: // Up
+                    if (y < Height - 1)
                     {
-                        currentCell = cells[x, y + 1];
-                        stack = RemoveCycle(stack, currentCell);
-                    }
-                    else if (y < Height - 1 && cells[x, y + 1].Visited)
-                    {
-                        unvisitedCells -= stack.Count;
-                        GoBackOnStack(stack);
-                        currentCell = SetGraphStart(ref cells);
-                    }
+                        if (y < Height - 1 && !cells[x, y + 1].Visited && !stack.Contains(cells[x, y + 1]))
+                        {
+                            currentCell = cells[x, y + 1];
+                            stack.Push(currentCell);
+                        }
+                        else if (y < Height - 1 && stack.Contains(cells[x, y + 1]))
+                        {
+                            currentCell = cells[x, y + 1];
+                            stack = RemoveCycle(stack, currentCell);
+                        }
+                        else if (y < Height - 1 && cells[x, y + 1].Visited)
+                        {
+                            unvisitedCells -= stack.Count;
+                            GoBackOnStack(stack);
+                            currentCell = SetGraphStart(ref cells);
+                        }
+                    }                    
                 break;
             }
-            Debug.Log(unvisitedCells);
         }
         while (unvisitedCells > 0);
     }
@@ -241,8 +251,18 @@ public class Generator
     private void GoBackOnStack(Stack<MazeCell> stack)
     {
         do
-            RemoveWall(stack.Pop(), stack.Peek());
+        {
+            MazeCell firstCell = stack.Pop();
+            MazeCell nextCell = stack.Peek();
+
+            firstCell.Visited = true;
+
+            RemoveWall(firstCell, nextCell);
+        }
         while (stack.Count > 1);
+
+        MazeCell lastCell = stack.Pop();
+        lastCell.Visited = true;
     }
 
     private void RemoveWall(MazeCell a, MazeCell b)
