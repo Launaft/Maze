@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Security.Cryptography;
 using UnityEngine;
 public class Generator
 {
@@ -96,7 +97,7 @@ public class Generator
         {
             if (w > 0 && h > 0 && w < Width-1 && h < Height-1)
             {
-                int i = Random.Range(0, 3);//Случайное число для направления
+                int i = Random.Range(0, 3);
                 switch (i)
                 {
                     case 0:
@@ -118,7 +119,7 @@ public class Generator
             }
             if (w == 0 && h > 0 && h < Height-1)
             {
-                int i = Random.Range(0, 2);//Случайное число для направления
+                int i = Random.Range(0, 2);
                 switch (i)
                 {
                     case 0:
@@ -138,7 +139,7 @@ public class Generator
             }
             if (h == 0 && w > 0 && w < Width-1)
             {
-                int i = Random.Range(0, 2);//Случайное число для направления
+                int i = Random.Range(0, 2);
                 switch (i)
                 {
                     case 0:
@@ -158,7 +159,7 @@ public class Generator
             }
             if (w == Width-1 && h > 0 && h < Height-1)
             {
-                int i = Random.Range(0, 2);//Случайное число для направления
+                int i = Random.Range(0, 2);
                 switch (i)
                 {
                     case 0:
@@ -178,7 +179,7 @@ public class Generator
             }
             if (h == Height-1 && w > 0 && w < Width-1)
             {
-                int i = Random.Range(0, 2);//Случайное число для направления
+                int i = Random.Range(0, 2);
                 switch (i)
                 {
                     case 0:
@@ -198,7 +199,7 @@ public class Generator
             }
             if (w == 0 && h == 0)
             {
-                int i = Random.Range(0, 1);//Случайное число для направления
+                int i = Random.Range(0, 1);
                 switch (i)
                 {
                     case 0:
@@ -216,7 +217,7 @@ public class Generator
             }
             if (w == 0 && h == Height-1)
             {
-                int i = Random.Range(0, 1);//Случайное число для направления
+                int i = Random.Range(0, 1);
                 switch (i)
                 {
                     case 0:
@@ -234,7 +235,7 @@ public class Generator
             }
             if (w == Width-1 && h == 0)
             {
-                int i = Random.Range(0, 1);//Случайное число для направления
+                int i = Random.Range(0, 1);
                 switch (i)
                 {
                     case 0:
@@ -252,7 +253,7 @@ public class Generator
             }
             if (w == Width-1 && h == Height-1)
             {
-                int i = Random.Range(0, 1);//Случайное число для направления
+                int i = Random.Range(0, 1);
                 switch (i)
                 {
                     case 0:
@@ -276,7 +277,7 @@ public class Generator
         MazeCell firstCell = cells[Random.Range(0, Width - 1), Random.Range(0, Height - 1)];
         firstCell.Visited = true;
         
-        MazeCell currentCell = SetGraphStart(ref cells);
+        MazeCell currentCell = SetStartCell(ref cells);
 
         int unvisitedCells = cells.Length - 1;
 
@@ -287,8 +288,15 @@ public class Generator
         {
             int x = currentCell.X;
             int y = currentCell.Y;
+            float r = RandomNumberGenerator.GetInt32(1, 5);
 
-            switch (Random.Range(1, 4))
+            if (stack.Count == 0)
+                currentCell = SetStartCell(ref cells);
+
+            if (!stack.Contains(currentCell))
+                stack.Push(currentCell);
+
+            switch (r)
             {
                 case 1: // Left
                     if (x > 0)
@@ -296,18 +304,17 @@ public class Generator
                         if (!cells[x - 1, y].Visited && !stack.Contains(cells[x - 1, y]))
                         {
                             currentCell = cells[x - 1, y];
-                            stack.Push(currentCell);
                         }
                         else if (stack.Contains(cells[x - 1, y]))
                         {
                             currentCell = cells[x - 1, y];
-                            stack = RemoveCycle(stack, currentCell);
+                            RemoveCycle(stack, currentCell);
                         }
                         else if (cells[x - 1, y].Visited)
                         {
                             unvisitedCells -= stack.Count;
+                            stack.Push(cells[x - 1, y]);
                             GoBackOnStack(stack);
-                            currentCell = SetGraphStart(ref cells);
                         }
                     }
                 break;
@@ -318,18 +325,17 @@ public class Generator
                         if (!cells[x, y - 1].Visited && !stack.Contains(cells[x, y - 1]))
                         {
                             currentCell = cells[x, y - 1];
-                            stack.Push(currentCell);
                         }
                         else if (stack.Contains(cells[x, y - 1]))
                         {
                             currentCell = cells[x, y - 1];
-                            stack = RemoveCycle(stack, currentCell);
+                            RemoveCycle(stack, currentCell);
                         }
                         else if (cells[x, y - 1].Visited)
                         {
                             unvisitedCells -= stack.Count;
+                            stack.Push(cells[x, y - 1]);
                             GoBackOnStack(stack);
-                            currentCell = SetGraphStart(ref cells);
                         }
                     }
                 break;
@@ -337,21 +343,20 @@ public class Generator
                 case 3: // Right
                     if (x < Width - 1)
                     {
-                        if (x < Width - 1 && !cells[x + 1, y].Visited && !stack.Contains(cells[x + 1, y]))
+                        if (!cells[x + 1, y].Visited && !stack.Contains(cells[x + 1, y]))
                         {
                             currentCell = cells[x + 1, y];
-                            stack.Push(currentCell);
                         }
-                        else if (x < Width - 1 && stack.Contains(cells[x + 1, y]))
+                        else if (stack.Contains(cells[x + 1, y]))
                         {
                             currentCell = cells[x + 1, y];
-                            stack = RemoveCycle(stack, currentCell);
+                            RemoveCycle(stack, currentCell);
                         }
-                        else if (x < Width - 1 && cells[x + 1, y].Visited)
+                        else if (cells[x + 1, y].Visited)
                         {
                             unvisitedCells -= stack.Count;
+                            stack.Push(cells[x + 1, y]);
                             GoBackOnStack(stack);
-                            currentCell = SetGraphStart(ref cells);
                         }
                     }
                 break;
@@ -359,30 +364,29 @@ public class Generator
                 case 4: // Up
                     if (y < Height - 1)
                     {
-                        if (y < Height - 1 && !cells[x, y + 1].Visited && !stack.Contains(cells[x, y + 1]))
+                        if (!cells[x, y + 1].Visited && !stack.Contains(cells[x, y + 1]))
                         {
                             currentCell = cells[x, y + 1];
-                            stack.Push(currentCell);
                         }
-                        else if (y < Height - 1 && stack.Contains(cells[x, y + 1]))
+                        else if (stack.Contains(cells[x, y + 1]))
                         {
                             currentCell = cells[x, y + 1];
-                            stack = RemoveCycle(stack, currentCell);
+                            RemoveCycle(stack, currentCell);
                         }
-                        else if (y < Height - 1 && cells[x, y + 1].Visited)
+                        else if (cells[x, y + 1].Visited)
                         {
                             unvisitedCells -= stack.Count;
+                            stack.Push(cells[x, y + 1]);
                             GoBackOnStack(stack);
-                            currentCell = SetGraphStart(ref cells);
                         }
                     }                    
                 break;
             }
         }
-        while (unvisitedCells > 0);
+        while (unvisitedCells > 1);
     }
 
-    private MazeCell SetGraphStart(ref MazeCell[,] cells)
+    private MazeCell SetStartCell(ref MazeCell[,] cells)
     {
         MazeCell startCell;
 
@@ -392,18 +396,16 @@ public class Generator
         return startCell;
     }
 
-    private Stack<MazeCell> RemoveCycle(Stack<MazeCell> stack, MazeCell cell)
+    private void RemoveCycle(Stack<MazeCell> stack, MazeCell cell)
     {
         do
             stack.Pop();
         while (stack.Peek() != cell);
-
-        return stack;
     }
 
     private void GoBackOnStack(Stack<MazeCell> stack)
     {
-        do
+        while (stack.Count > 1)
         {
             MazeCell firstCell = stack.Pop();
             MazeCell nextCell = stack.Peek();
@@ -412,7 +414,6 @@ public class Generator
 
             RemoveWall(firstCell, nextCell);
         }
-        while (stack.Count > 1);
 
         MazeCell lastCell = stack.Pop();
         lastCell.Visited = true;
