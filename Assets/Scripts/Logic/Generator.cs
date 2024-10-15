@@ -26,7 +26,7 @@ public class Generator
                 RecursiveBacktracker(cells);
                 break;
             case 1:
-                AldousBroderAlgorithm();
+                AldousBroderAlgorithm(cells);
                 break;
             case 2:
                 WilsonsAlgorithm(cells);
@@ -81,23 +81,22 @@ public class Generator
         while (stack.Count > 0);
     }
 
-    private void AldousBroderAlgorithm()
+    private void AldousBroderAlgorithm(MazeCell[,] cells)
     {
-        int[,] gridMaze = new int[Width, Height];
-        int[,] gridVizited = new int[Width, Height];
+        MazeCell currentCell = cells[0, 0];
+        currentCell.Visited = true;
+
+        //int[,] gridMaze = new int[Width, Height];
+        //int[,] gridVizited = new int[Width, Height];
         int w = 0;
         int h = 0;
-        gridVizited[0, 0] = 1;
+        //gridVizited[0, 0] = 1;
         int summVizited = 1;
-        while (summVizited < Width * Height)
+        while (summVizited < cells.Length)
         {
-            if (w > 0 && h > 0 && w < Width && h < Height)
+            if (w > 0 && h > 0 && w < Width-1 && h < Height-1)
             {
                 int i = Random.Range(0, 3);//Случайное число для направления
-                if (i == 0)
-                {
-                    w--;
-                }
                 switch (i)
                 {
                     case 0:
@@ -109,11 +108,165 @@ public class Generator
                     case 3:
                         h--; break;
                 }
-                if (gridVizited[w, h] == 0)
+                if (cells[w, h].Visited == false)
                 {
-                    gridVizited[w, h] = 1;
-                    //Уничтожение стенки тут будет
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
                 }
+                currentCell = cells[w, h];
+            }
+            if (w == 0 && h > 0 && h < Height-1)
+            {
+                int i = Random.Range(0, 2);//Случайное число для направления
+                switch (i)
+                {
+                    case 0:
+                        w++; break;
+                    case 1:
+                        h++; break;
+                    case 2:
+                        h--; break;
+                }
+                if (cells[w, h].Visited == false)
+                {
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
+                }
+                currentCell = cells[w, h];
+            }
+            if (h == 0 && w > 0 && w < Width-1)
+            {
+                int i = Random.Range(0, 2);//Случайное число для направления
+                switch (i)
+                {
+                    case 0:
+                        w++; break;
+                    case 1:
+                        h++; break;
+                    case 2:
+                        w--; break;
+                }
+                if (cells[w, h].Visited == false)
+                {
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
+                }
+                currentCell = cells[w, h];
+            }
+            if (w == Width-1 && h > 0 && h < Height-1)
+            {
+                int i = Random.Range(0, 2);//Случайное число для направления
+                switch (i)
+                {
+                    case 0:
+                        h--; break;
+                    case 1:
+                        h++; break;
+                    case 2:
+                        w--; break;
+                }
+                if (cells[w, h].Visited == false)
+                {
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
+                }
+                currentCell = cells[w, h];
+            }
+            if (h == Height-1 && w > 0 && w < Width-1)
+            {
+                int i = Random.Range(0, 2);//Случайное число для направления
+                switch (i)
+                {
+                    case 0:
+                        h--; break;
+                    case 1:
+                        w++; break;
+                    case 2:
+                        w--; break;
+                }
+                if (cells[w, h].Visited == false)
+                {
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
+                }
+                currentCell = cells[w, h];
+            }
+            if (w == 0 && h == 0)
+            {
+                int i = Random.Range(0, 1);//Случайное число для направления
+                switch (i)
+                {
+                    case 0:
+                        w++; break;
+                    case 1:
+                        h++; break;
+                }
+                if (cells[w, h].Visited == false)
+                {
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
+                }
+                currentCell = cells[w, h];
+            }
+            if (w == 0 && h == Height-1)
+            {
+                int i = Random.Range(0, 1);//Случайное число для направления
+                switch (i)
+                {
+                    case 0:
+                        w++; break;
+                    case 1:
+                        h--; break;
+                }
+                if (cells[w, h].Visited == false)
+                {
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
+                }
+                currentCell = cells[w, h];
+            }
+            if (w == Width-1 && h == 0)
+            {
+                int i = Random.Range(0, 1);//Случайное число для направления
+                switch (i)
+                {
+                    case 0:
+                        w--; break;
+                    case 1:
+                        h++; break;
+                }
+                if (cells[w, h].Visited == false)
+                {
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
+                }
+                currentCell = cells[w, h];
+            }
+            if (w == Width-1 && h == Height-1)
+            {
+                int i = Random.Range(0, 1);//Случайное число для направления
+                switch (i)
+                {
+                    case 0:
+                        w--; break;
+                    case 1:
+                        h--; break;
+                }
+                if (cells[w, h].Visited == false)
+                {
+                    cells[w, h].Visited = true;
+                    summVizited++;
+                    RemoveWall(currentCell, cells[w, h]);
+                }
+                currentCell = cells[w, h];
             }
         }
     }
