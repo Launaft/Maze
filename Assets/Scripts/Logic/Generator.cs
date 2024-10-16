@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using UnityEngine;
 public class Generator
 {
@@ -33,11 +32,92 @@ public class Generator
                 WilsonsAlgorithm(cells);
                 break;
         }
+
+        CreateLoops(cells);
+        Deykstra(cells);
         
         Maze maze = new Maze();
         maze.cells = cells;
 
         return maze;
+    }
+
+    private void Deykstra(MazeCell[,] cells)
+    {
+        int unvisitedCells = cells.Length - 1;
+
+        for (int x = 0; x < cells.GetLength(0); x++)
+            for (int y = 0; y < cells.GetLength(1); y++) 
+            { 
+                cells[x, y].Weight = 99999;
+                cells[x, y].Visited = false;
+            }
+
+        MazeCell entrance = cells[Random.Range(0, Width - 1), Random.Range(0, Height - 1)];
+        entrance.Weight = 0;
+        entrance.Visited = true;
+
+        do
+        {
+
+        }
+        while (unvisitedCells > 0);
+    }
+
+    private void CreateLoops(MazeCell[,] cells)
+    {
+        int sectorWidth = Width / 2;
+        int sectorHeight = Height / 2;
+        int offsetX = 0;
+        int offsetY = 0;
+
+        MazeCell[,] sector = new MazeCell[sectorWidth, sectorHeight];
+
+        for (int i = 0; i < 4; i++)
+        {
+            for (int x = 0; x < sectorWidth - 1; x++)
+                for (int y = 0; y < sectorHeight - 1; y++)
+                {
+                    sector[x, y] = cells[x + offsetX, y + offsetY];
+                    Debug.Log(x + " " + y);
+                }
+
+            MazeCell cell1 = sector[Random.Range(0, sectorWidth - 1), Random.Range(0, sectorHeight - 1)];
+
+            List<MazeCell> neighbours = new List<MazeCell>();
+
+            int cx = cell1.X;
+            int cy = cell1.Y;
+
+            if (cx > 0)
+                neighbours.Add(cells[cx - 1, cy]);
+
+            if (cy > 0)
+                neighbours.Add(cells[cx, cy - 1]);
+
+            if (cx < Width - 1)
+                neighbours.Add(cells[cx + 1, cy]);
+
+            if (cy < Height - 1)
+                neighbours.Add(cells[cx, cy + 1]);
+
+            MazeCell cell2 = neighbours[Random.Range(0, neighbours.Count - 1)];
+
+            RemoveWall(cell1, cell2);
+
+            switch (i)
+            {
+                case 0:
+                    offsetY += sectorHeight;
+                    break;
+                case 1:
+                    offsetX += sectorWidth;
+                    break;
+                case 2: offsetY -= sectorHeight;
+                    break;
+            }
+            
+        }
     }
 
     private void RecursiveBacktracker(MazeCell[,] cells)
@@ -84,9 +164,41 @@ public class Generator
 
     private void AldousBroderAlgorithm(MazeCell[,] cells)
     {
-        MazeCell currentCell = cells[0, 0];
+        MazeCell currentCell = cells[Random.Range(0, Width - 1), Random.Range(0, Height - 1)];
         currentCell.Visited = true;
+        int summVisited = 1;
+        while (summVisited < cells.Length)
+        {
+            List<MazeCell> PossibleDirections = new List<MazeCell>();
 
+            int x = currentCell.X;
+            int y = currentCell.Y;
+
+            if (x > 0)
+                PossibleDirections.Add(cells[x - 1, y]);
+
+            if (y > 0)
+                PossibleDirections.Add(cells[x, y - 1]);
+
+            if (x < Width - 1)
+                PossibleDirections.Add(cells[x + 1, y]);
+
+            if (y < Height - 1)
+                PossibleDirections.Add(cells[x, y + 1]);
+
+            MazeCell nextCell = PossibleDirections[Random.Range(0, PossibleDirections.Count)];
+
+            if (!nextCell.Visited)
+            {
+                RemoveWall(currentCell, nextCell);
+                nextCell.Visited = true;
+                summVisited++;
+            }
+
+            currentCell = nextCell;
+        }
+
+        /*
         //int[,] gridMaze = new int[Width, Height];
         //int[,] gridVizited = new int[Width, Height];
         int w = 0;
@@ -269,7 +381,7 @@ public class Generator
                 }
                 currentCell = cells[w, h];
             }
-        }
+        }*/
     }
 
     private void WilsonsAlgorithm(MazeCell[,] cells)
@@ -277,26 +389,58 @@ public class Generator
         MazeCell firstCell = cells[Random.Range(0, Width - 1), Random.Range(0, Height - 1)];
         firstCell.Visited = true;
         
-        MazeCell currentCell = SetStartCell(ref cells);
+        MazeCell currentCell = SetStartCell(cells);
 
-        int unvisitedCells = cells.Length - 1;
+        //int unvisitedCells = cells.Length - 1;
+        int sumVisited = 1;
 
         Stack<MazeCell> stack = new Stack<MazeCell>();
-        stack.Push(currentCell);
 
         do
         {
             int x = currentCell.X;
             int y = currentCell.Y;
-            float r = RandomNumberGenerator.GetInt32(1, 5);
+            //float r = RandomNumberGenerator.GetInt32(1, 5);
 
-            if (stack.Count == 0)
-                currentCell = SetStartCell(ref cells);
+            List<MazeCell> possibleDirections = new List<MazeCell>();
 
-            if (!stack.Contains(currentCell))
-                stack.Push(currentCell);
+            if (x > 0)
+                possibleDirections.Add(cells[x - 1, y]);
 
-            switch (r)
+            if (y > 0)
+                possibleDirections.Add(cells[x, y - 1]);
+
+            if (x < Width - 1)
+                possibleDirections.Add(cells[x + 1, y]);
+
+            if (y < Height - 1)
+                possibleDirections.Add(cells[x, y + 1]);
+
+
+            if (possibleDirections.Count > 0)
+            {
+                MazeCell nextCell = possibleDirections[Random.Range(0, possibleDirections.Count)];
+
+                if (!nextCell.Visited && !stack.Contains(nextCell))
+                {
+                    currentCell = nextCell;
+                    stack.Push(currentCell);
+                }
+                else if (stack.Contains(nextCell))
+                {
+                    currentCell = nextCell;
+                    RemoveCycle(stack, currentCell);
+                }
+                else if (nextCell.Visited)
+                {
+                    sumVisited += stack.Count;
+                    Debug.Log(sumVisited);
+                    stack.Push(nextCell);
+                    GoBackOnStack(stack);
+                    currentCell = SetStartCell(cells);
+                }
+            }
+            /*switch (r)
             {
                 case 1: // Left
                     if (x > 0)
@@ -381,12 +525,12 @@ public class Generator
                         }
                     }                    
                 break;
-            }
+            }*/
         }
-        while (unvisitedCells > 1);
+        while (sumVisited < cells.Length - 1);
     }
 
-    private MazeCell SetStartCell(ref MazeCell[,] cells)
+    private MazeCell SetStartCell(MazeCell[,] cells)
     {
         MazeCell startCell;
 
@@ -398,8 +542,7 @@ public class Generator
 
     private void RemoveCycle(Stack<MazeCell> stack, MazeCell cell)
     {
-        do
-            stack.Pop();
+        do stack.Pop();
         while (stack.Peek() != cell);
     }
 

@@ -42,7 +42,7 @@ public class Spawner : MonoBehaviour
         cam.transform.position = new Vector3((Width * CellSize.x) / 2, Mathf.Max(Width, Height) * 3, (Height * CellSize.y) / 2);
     }
 
-    public void ChangeHeight(float value) => Height = 3;//(int)value;
-    public void ChangeWidht(float value) => Width = 3;//(int)value;
+    public void ChangeHeight(float value) => Height = (int)value;
+    public void ChangeWidht(float value) => Width = (int)value;
     public void ChangeGenerationAlgorithm (int value) => _generationAlgorithm = value;
 }
