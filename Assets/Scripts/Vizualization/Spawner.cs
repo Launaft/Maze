@@ -8,6 +8,8 @@ public class Spawner : MonoBehaviour
     public Cell CellPrefab;
     public Vector2 CellSize = new Vector2(1, 1);
 
+    public GameObject PlayerPrefab;
+
     public int Width;
     public int Height;
 
@@ -20,6 +22,11 @@ public class Spawner : MonoBehaviour
 
         Generator generator = new Generator();
         Maze maze = generator.GenerateMaze(Width, Height, _generationAlgorithm);
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player != null)
+            Destroy(player);
 
         for (int x = 0; x < maze.cells.GetLength(0); x++)
         {
@@ -59,8 +66,13 @@ public class Spawner : MonoBehaviour
 
                 c.transform.parent = mazeHandler.transform;
                 c.distance.text = maze.cells[x, z].Distance.ToString();
+
+                if (maze.cells[x, z].Distance == 0)
+                    Instantiate(PlayerPrefab, new Vector3(x * CellSize.x, 1, z * CellSize.y), Quaternion.identity);
             }
         }
+
+        CameraSwitch.OnMazeGenerated?.Invoke();
         cam.transform.position = new Vector3((Width * CellSize.x) / 2, Mathf.Max(Width, Height) * 3, (Height * CellSize.y) / 2);
     }
 
