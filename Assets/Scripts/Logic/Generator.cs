@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting.Antlr3.Runtime;
 using UnityEngine;
 public class Generator
 {
@@ -34,7 +36,7 @@ public class Generator
         }
 
         CreateLoops(cells);
-        Deykstra(cells);
+        Dijkstra(cells);
         
         Maze maze = new Maze();
         maze.cells = cells;
@@ -42,26 +44,92 @@ public class Generator
         return maze;
     }
 
-    private void Deykstra(MazeCell[,] cells)
+    private void Dijkstra(MazeCell[,] cells)
     {
-        int unvisitedCells = cells.Length - 1;
-
         for (int x = 0; x < cells.GetLength(0); x++)
-            for (int y = 0; y < cells.GetLength(1); y++) 
-            { 
-                cells[x, y].Weight = 99999;
+            for (int y = 0; y < cells.GetLength(1); y++)
+            {
                 cells[x, y].Visited = false;
+                cells[x, y].Distance = 99;
             }
 
-        MazeCell entrance = cells[Random.Range(0, Width - 1), Random.Range(0, Height - 1)];
-        entrance.Weight = 0;
-        entrance.Visited = true;
+        MazeCell currentCell = CreateEntrance(cells);
+        currentCell.Distance = 0;
 
-        do
+        for (int i = 0;  i < cells.Length; i++)
         {
+            currentCell = MinDistance(cells);
+            currentCell.Visited = true;
 
+            List<MazeCell> neighbours = new List<MazeCell>();
+
+            int x = currentCell.X;
+            int y = currentCell.Y;
+
+            if (x > 0 && !currentCell.Visited && !currentCell.West)
+                neighbours.Add(cells[x - 1, y]);
+
+            if (y > 0 && !currentCell.Visited && !currentCell.South)
+                neighbours.Add(cells[x, y - 1]);
+
+            if (x < Width - 1 && !currentCell.Visited && !currentCell.East)
+                neighbours.Add(cells[x + 1, y]);
+
+            if (y < Height - 1 && !currentCell.Visited && !currentCell.North)
+                neighbours.Add(cells[x, y + 1]);
+
+            for (int n = 0; n < neighbours.Count; n++)
+            {
+                if (neighbours[n].Distance > currentCell.Distance + 1)
+                    neighbours[n].Distance = currentCell.Distance + 1;
+            }
         }
-        while (unvisitedCells > 0);
+    }
+
+    private MazeCell MinDistance(MazeCell[,] cells)
+    {
+        int min = 99;
+        
+        MazeCell mazeCell = new MazeCell();
+
+        for (int x = 0; x < cells.GetLength(0); x++)
+            for (int y = 0; y < cells.GetLength(1); y++)
+            {
+                if (!cells[x, y].Visited && cells[x, y].Distance < min)
+                {
+                    min = cells[x, y].Distance;
+                    mazeCell = cells[x, y];
+                }
+            }
+
+        return mazeCell;
+    }
+
+    private MazeCell CreateEntrance(MazeCell[,] cells)
+    {
+        MazeCell entrance = cells[0, 0];
+
+        switch (Random.Range(1, 4))
+        {
+            case 0:
+                entrance = cells[0, Random.Range(0, Height - 1)];
+                entrance.WestE = true;
+                break;
+            case 1:
+                entrance = cells[Random.Range(0, Width - 1), 0];
+                entrance.SouthE = true;
+                break;
+            case 2:
+                entrance = cells[Width - 1, Random.Range(0, Height - 1)];
+                entrance.EastE = true;
+                break;
+            case 3:
+                entrance = cells[Random.Range(0, Width - 1), Height - 1];
+                entrance.NorthE = true;
+                break;
+        }
+
+        return entrance;
     }
 
     private void CreateLoops(MazeCell[,] cells)
@@ -79,7 +147,6 @@ public class Generator
                 for (int y = 0; y < sectorHeight - 1; y++)
                 {
                     sector[x, y] = cells[x + offsetX, y + offsetY];
-                    Debug.Log(x + " " + y);
                 }
 
             MazeCell cell1 = sector[Random.Range(0, sectorWidth - 1), Random.Range(0, sectorHeight - 1)];

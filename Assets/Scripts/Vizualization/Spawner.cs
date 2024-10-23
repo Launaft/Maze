@@ -36,7 +36,29 @@ public class Spawner : MonoBehaviour
                 if (maze.cells[x, z].South == false)
                     Destroy(c.South);
 
+                if (maze.cells[x, z].WestE == true)
+                {
+                    Destroy(c.West);
+                    c.WestEntrance.SetActive(true);
+                }
+                if (maze.cells[x, z].EastE == true)
+                {
+                    Destroy(c.East);
+                    c.EastEntrance.SetActive(true);
+                }
+                if (maze.cells[x, z].NorthE == true)
+                {
+                    Destroy(c.North);
+                    c.NorthEntrance.SetActive(true);
+                }
+                if (maze.cells[x, z].SouthE == true)
+                {
+                    Destroy(c.South);
+                    c.SouthEntrance.SetActive(true);
+                }
+
                 c.transform.parent = mazeHandler.transform;
+                c.distance.text = maze.cells[x, z].Distance.ToString();
             }
         }
         cam.transform.position = new Vector3((Width * CellSize.x) / 2, Mathf.Max(Width, Height) * 3, (Height * CellSize.y) / 2);
