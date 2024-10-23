@@ -14,9 +14,9 @@ public class Generator
 
         MazeCell[,] cells = new MazeCell[Width, Height];
 
-        for (int x = 0; x < cells.GetLength(0); x++)
+        for (int x = 0; x < Width; x++)
         {
-            for (int y = 0; y < cells.GetLength(1); y++) 
+            for (int y = 0; y < Height; y++) 
             { 
                 cells[x, y] = new MazeCell { X = x, Y = y };
             }
@@ -37,7 +37,8 @@ public class Generator
 
         CreateLoops(cells);
         Dijkstra(cells);
-        
+        CreateExit(cells);
+
         Maze maze = new Maze();
         maze.cells = cells;
 
@@ -46,8 +47,8 @@ public class Generator
 
     private void Dijkstra(MazeCell[,] cells)
     {
-        for (int x = 0; x < cells.GetLength(0); x++)
-            for (int y = 0; y < cells.GetLength(1); y++)
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
             {
                 cells[x, y].Visited = false;
                 cells[x, y].Distance = 99;
@@ -56,7 +57,7 @@ public class Generator
         MazeCell currentCell = CreateEntrance(cells);
         currentCell.Distance = 0;
 
-        for (int i = 0;  i < cells.Length; i++)
+        for (int i = 0; i < cells.Length; i++)
         {
             currentCell = MinDistance(cells);
             currentCell.Visited = true;
@@ -66,16 +67,16 @@ public class Generator
             int x = currentCell.X;
             int y = currentCell.Y;
 
-            if (x > 0 && !currentCell.Visited && !currentCell.West)
+            if (x > 0 && !cells[x - 1, y].Visited && !currentCell.West)
                 neighbours.Add(cells[x - 1, y]);
 
-            if (y > 0 && !currentCell.Visited && !currentCell.South)
+            if (y > 0 && !cells[x, y - 1].Visited && !currentCell.South)
                 neighbours.Add(cells[x, y - 1]);
 
-            if (x < Width - 1 && !currentCell.Visited && !currentCell.East)
+            if (x < Width - 1 && !cells[x + 1, y].Visited && !currentCell.East)
                 neighbours.Add(cells[x + 1, y]);
 
-            if (y < Height - 1 && !currentCell.Visited && !currentCell.North)
+            if (y < Height - 1 && !cells[x, y + 1].Visited && !currentCell.North)
                 neighbours.Add(cells[x, y + 1]);
 
             for (int n = 0; n < neighbours.Count; n++)
@@ -92,8 +93,8 @@ public class Generator
         
         MazeCell mazeCell = new MazeCell();
 
-        for (int x = 0; x < cells.GetLength(0); x++)
-            for (int y = 0; y < cells.GetLength(1); y++)
+        for (int x = 0; x < Width; x++)
+            for (int y = 0; y < Height; y++)
             {
                 if (!cells[x, y].Visited && cells[x, y].Distance < min)
                 {
@@ -107,7 +108,7 @@ public class Generator
 
     private MazeCell CreateEntrance(MazeCell[,] cells)
     {
-        MazeCell entrance = cells[0, 0];
+        MazeCell entrance = new MazeCell();
 
         switch (Random.Range(1, 4))
         {
@@ -130,6 +131,69 @@ public class Generator
         }
 
         return entrance;
+    }
+
+    private void CreateExit(MazeCell[,] cells)
+    {
+        MazeCell exit = new MazeCell();
+        int max = 0;
+        int exitDirection = -1;
+
+        for (int x = 0; x < Width; x++)
+        {
+            if (cells[x, 0].Distance > max)
+            {
+                exit = cells[x, 0];
+                exitDirection = 0;
+                max = cells[x, 0].Distance;
+            }
+        }
+
+        for (int y = 0; y < Height; y++)
+        {
+            if (cells[0, y].Distance > max)
+            {
+                exit = cells[0, y];
+                exitDirection = 1;
+                max = cells[0, y].Distance;
+            }
+        }
+
+        for (int x = Width - 1; x > 0; x--)
+        {
+            if (cells[x, Height - 1].Distance > max)
+            {
+                exit = cells[x, Height - 1];
+                exitDirection = 2;
+                max = cells[x, Height - 1].Distance;
+            }
+        }
+
+        for (int y = Height - 1; y > 0; y--)
+        {
+            if (cells[Width - 1, y].Distance > max)
+            {
+                exit = cells[Width - 1, y];
+                exitDirection = 3;
+                max = cells[Width - 1, y].Distance;
+            }
+        }
+
+        switch (exitDirection)
+        {
+            case 0:
+                exit.SouthE = true;
+                break;
+            case 1:
+                exit.WestE = true;
+                break;
+            case 2:
+                exit.NorthE = true;
+                break;
+            case 3:
+                exit.EastE = true;
+                break;
+        }
     }
 
     private void CreateLoops(MazeCell[,] cells)
