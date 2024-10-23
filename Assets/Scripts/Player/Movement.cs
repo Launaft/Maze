@@ -16,8 +16,5 @@ public class Movement : MonoBehaviour
         controller.Move(transform.TransformDirection(move) * Time.deltaTime * playerSpeed);
     }
 
-    void LateUpdate()
-    {
-        playerMove();
-    }
+    void Update() => playerMove();
 }

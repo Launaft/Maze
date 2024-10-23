@@ -23,7 +23,7 @@ public class CameraSwitch : MonoBehaviour
         _firstPerson = true;
     }
 
-    private void Update()
+    /*private void Update()
     {
         if (_playerCamera != null)
         {
@@ -44,5 +44,5 @@ public class CameraSwitch : MonoBehaviour
                 _camera.enabled = true;
             }
         }
-    }
+    }*/
 }

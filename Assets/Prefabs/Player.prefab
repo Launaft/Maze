@@ -119,7 +119,7 @@ GameObject:
   - component: {fileID: 4119817740095783319}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Player
+  m_TagString: Player Camera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -170,8 +170,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
+  near clip plane: 0.1
+  far clip plane: 100
   field of view: 60
   orthographic: 0
   orthographic size: 5
